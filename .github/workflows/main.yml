@@ -30,7 +30,7 @@ jobs:
       - name: JSON to variables
         uses: rgarcia-phi/json-to-variables@v1.1.0
         with:
-         filename: '*/package.json'
+         filename: '${{ secrets.PACKAGE_PATH }}'
          prefix: packageMeta
          masked: true
       # Create a package directory
