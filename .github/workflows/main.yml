@@ -40,7 +40,7 @@ jobs:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
           automatic_release_tag: "v${{ env.MAJOR_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}"
           prerelease: false
-          title: "v${{ env.MAJOR_VERSION}.${{ env.GITHUB_RUN_NUMBER }} Release"
+          title: "v${{ env.MAJOR_VERSION }}.${{ env.GITHUB_RUN_NUMBER }} Release"
           files: |
               package/PFCToolkit-v${{ env.MAJOR_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}.unitypackage
       # Echo the list of files in the package directory
