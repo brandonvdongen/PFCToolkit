@@ -38,11 +38,11 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
-          automatic_release_tag: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}"
+          automatic_release_tag: "v${{ env.MAJOR_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}"
           prerelease: false
-          title: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER} Release"
+          title: "v${{ env.MAJOR_VERSION}.${{ env.GITHUB_RUN_NUMBER }} Release"
           files: |
-              package/PFCToolkit-v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}.unitypackage
+              package/PFCToolkit-v${{ env.MAJOR_VERSION }}.${{ env.GITHUB_RUN_NUMBER }}.unitypackage
       # Echo the list of files in the package directory
       - name: Echo files
         run: ls package/
