@@ -25,7 +25,7 @@ jobs:
       with:
         ref: 'master'
     - run: |
-        find . -name \*.meta | sed 's/^\.\//packages\/nl.brandonvdongen.pfctoolkit\//' >> metaList
+        find . -name \*.meta >> metaList
     - run: mkdir package
 
     - uses: pCYSl5EDgo/create-unitypackage@master
