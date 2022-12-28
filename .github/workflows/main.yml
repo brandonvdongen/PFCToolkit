@@ -35,9 +35,9 @@ jobs:
     - uses: "marvinpinto/action-automatic-releases@latest"
       with:
         repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "Latest"
+        automatic_release_tag: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}"
         prerelease: false
-        title: "Latest Release"
+        title: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER} Release"
         files: |
             package/PFCToolkit.unitypackage
     - name: Version release file
@@ -46,6 +46,12 @@ jobs:
       run: ls package/
     - name: Send file to discord channel
       uses: sinshutu/upload-to-discord@master
+      env:
+        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+      with:
+        args: package/*
+    - name: Discord notification
+      uses: brandonvdongen/github-to-discord@main
       env:
         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
         MESSAGE_TITLE: New Version
