@@ -26,6 +26,13 @@ jobs:
       # Find all files with the .meta extension and save the list to a file
       - run: |
           find . -name \*.meta >> metaList
+          
+      - name: JSON to variables
+        uses: rgarcia-phi/json-to-variables@v1.1.0
+        with:
+         filename: 'Packages/nl.brandonvdongen.pfctoolkit/package.json'
+         prefix: packageMeta
+         masked: true
       # Create a package directory
       - run: mkdir package
 
@@ -36,7 +43,7 @@ jobs:
           include-files: metaList
       # copy the unity package file with the version number
       - name: Version release file
-        run: cp "package/PFCToolkit.unitypackage" "package/PFCToolkit-v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}.unitypackage"
+        run: cp "package/PFCToolkit.unitypackage" "package/PFCToolkit-v${{ env.packageMeta_version }}.unitypackage"
         # Rename the unity package to latest
       - name: Version release file
         run: mv "package/PFCToolkit.unitypackage" "package/Latest.unitypackage"
@@ -44,12 +51,11 @@ jobs:
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
           repo_token: "${{secrets.GITHUB_TOKEN}}"
-          automatic_release_tag: "v${{ env.MAJOR_VERSION }}.${{ github.run_number }}"
+          automatic_release_tag: "v${{ env.packageMeta_version }}"
           prerelease: false
-          title: "v${{ env.MAJOR_VERSION }}.${{ github.run_number }} Release"
+          title: "v${{ env.packageMeta_version }} Release"
           files: |
-              package/PFCToolkit-v${{ env.MAJOR_VERSION }}.${{ github.run_number }}.unitypackage
-              _RUN_NUMBER}.unitypackage"
+              package/PFCToolkit-v${{ env.packageMeta_version }}.unitypackage
       # Use the automatic-releases action to create a new release and upload the unity package as an asset
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
