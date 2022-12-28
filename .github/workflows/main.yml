@@ -1,59 +1,63 @@
 name: Package Tools
 
-# Controls when the action will run. 
+# Controls when the action will run
 on:
-  # Triggers the workflow on push or pull request events but only for the main branch
-  #push:
-   # branches: [ master ]
-  #pull_request:
-  #  branches: [ main ]
-
-  # Allows you to run this workflow manually from the Actions tab
+  # Triggers the workflow manually from the Actions tab
   workflow_dispatch:
 
-# A workflow run is made up of one or more jobs that can run sequentially or in parallel
 jobs:
-  PackgeTools:
+  # Renamed job to "Build Package"
+  BuildPackage:
     runs-on: ubuntu-latest
+    # Set the MAJOR_VERSION environment variable
     env:
       MAJOR_VERSION: 0
     defaults:
       run:
         shell: bash
     steps:
-    - uses: actions/checkout@v2
-      with:
-        ref: 'master'
-    - run: |
-        find . -name \*.meta >> metaList
-    - run: mkdir package
+      # Check out the repository's code
+      - uses: actions/checkout@v2
+        with:
+          ref: 'master'
+      # Find all files with the .meta extension and save the list to a file
+      - run: |
+          find . -name \*.meta >> metaList
+      # Create a package directory
+      - run: mkdir package
 
-    - uses: pCYSl5EDgo/create-unitypackage@master
-      with:
-        package-path: 'package/PFCToolkit.unitypackage'
-        include-files: metaList
-    - uses: "marvinpinto/action-automatic-releases@latest"
-      with:
-        repo_token: "${{ secrets.GITHUB_TOKEN }}"
-        automatic_release_tag: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}"
-        prerelease: false
-        title: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER} Release"
-        files: |
-            package/PFCToolkit.unitypackage
-    - name: Version release file
-      run: mv "package/PFCToolkit.unitypackage" "package/PFCToolkit-v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}.unitypackage"
-    - name: Echo files
-      run: ls package/
-    - name: Send file to discord channel
-      uses: sinshutu/upload-to-discord@master
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-      with:
-        args: package/*
-    - name: Discord notification
-      uses: brandonvdongen/github-to-discord@main
-      env:
-        DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-        MESSAGE_TITLE: New Version
-        MESSAGE_URL: https://github.com/brandonvdongen/PFCToolkit/releases
-        MESSAGE_COLOR: 5814783
+      # Use the create-unitypackage action to create a unity package from the .meta file list
+      - uses: pCYSl5EDgo/create-unitypackage@master
+        with:
+          package-path: 'package/PFCToolkit.unitypackage'
+          include-files: metaList
+      # Use the automatic-releases action to create a new release and upload the unity package as an asset
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{ secrets.GITHUB_TOKEN }}"
+          automatic_release_tag: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}"
+          prerelease: false
+          title: "v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER} Release"
+          files: |
+              package/PFCToolkit.unitypackage
+      # Rename the unity package file with the version number
+      - name: Version release file
+        run: mv "package/PFCToolkit.unitypackage" "package/PFCToolkit-v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}.unitypackage"
+      # Echo the list of files in the package directory
+      - name: Echo files
+        run: ls package/
+      # Use the upload-to-discord action to send the unity package to a Discord channel
+      - name: Send file to discord channel
+        uses: sinshutu/upload-to-discord@master
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+        with:
+          args: package/*
+      # Use the github-to-discord action to send a notification to a Discord channel
+      - name: Discord notification
+        uses: brandonvdongen/github-to-discord@main
+        env:
+          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+          MESSAGE_TITLE: New Version
+          MESSAGE_URL: https://github.com/brandonvdongen/PFCToolkit/releases
+          MESSAGE_COLOR: 5814783
