@@ -31,9 +31,12 @@ jobs:
         with:
           package-path: 'package/PFCToolkit.unitypackage'
           include-files: metaList
-      # Rename the unity package file with the version number
+      # copy the unity package file with the version number
       - name: Version release file
-        run: mv "package/PFCToolkit.unitypackage" "package/PFCToolkit-v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}.unitypackage"
+        run: cp "package/PFCToolkit.unitypackage" "package/PFCToolkit-v${MAJOR_VERSION}.${GITHUB_RUN_NUMBER}.unitypackage"
+        # Rename the unity package to latest
+      - name: Version release file
+        run: mv "package/PFCToolkit.unitypackage" "package/PFCToolkit-Latest.unitypackage"
       # Use the automatic-releases action to create a new release and upload the unity package as an asset
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
@@ -52,7 +55,7 @@ jobs:
           prerelease: false
           title: "Latest Release"
           files: |
-              package/PFCToolkit-v${{ env.MAJOR_VERSION }}.${{ github.run_number }}.unitypackage
+              package/PFCToolkit-Latest.unitypackage
       # Echo the list of files in the package directory
       - name: Echo files
         run: ls package/
