@@ -68,3 +68,10 @@ jobs:
       # Echo the list of files in the package directory
       - name: Echo files
         run: ls package/
+      - name: Discord notification
+        uses: brandonvdongen/github-to-discord@main
+        env:
+         DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
+         MESSAGE_TITLE: New Version
+         MESSAGE_URL: https://github.com/brandonvdongen/PFCToolkit
+         MESSAGE_COLOR: 5814783
