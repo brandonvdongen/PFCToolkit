@@ -72,7 +72,7 @@ jobs:
         uses: brandonvdongen/github-to-discord@main
         env:
          DISCORD_WEBHOOK: ${{ secrets.DISCORD_WEBHOOK }}
-         MESSAGE_TITLE: "Version v${{ env.packageMeta_version }} of PFCToolkit released!"
-         MESSAGE_DESCRIPTION: "Update from the menu in the editor or download it from the release page on github!"
+         MESSAGE_TITLE: Version v${{ env.packageMeta_version }} of PFCToolkit released!
+         MESSAGE_DESCRIPTION: Update from the menu in the editor or download it from the release page on github!
          MESSAGE_URL: https://github.com/brandonvdongen/PFCToolkit
          MESSAGE_COLOR: 5814783
