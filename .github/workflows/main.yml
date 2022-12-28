@@ -43,6 +43,16 @@ jobs:
           title: "v${{ env.MAJOR_VERSION }}.${{ github.run_number }} Release"
           files: |
               package/PFCToolkit-v${{ env.MAJOR_VERSION }}.${{ github.run_number }}.unitypackage
+              _RUN_NUMBER}.unitypackage"
+      # Use the automatic-releases action to create a new release and upload the unity package as an asset
+      - uses: "marvinpinto/action-automatic-releases@latest"
+        with:
+          repo_token: "${{secrets.GITHUB_TOKEN}}"
+          automatic_release_tag: "Latest"
+          prerelease: false
+          title: "Latest Release"
+          files: |
+              package/PFCToolkit-v${{ env.MAJOR_VERSION }}.${{ github.run_number }}.unitypackage
       # Echo the list of files in the package directory
       - name: Echo files
         run: ls package/
