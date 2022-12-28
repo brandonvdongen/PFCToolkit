@@ -15,28 +15,44 @@ public static class VersionManager {
         public string latestUrl;
     }
 
-    internal static async void UpdatePackage(string packageUrl, bool ShowDialog) {
-        VersionManager.PackageMeta package = await VersionManager.GetPackageInfo(packageUrl);
-        try {
-            Debug.Log($"Downloading: {package.name}, version {package.version}, from: {package.latestUrl}");
-            string filePath = Path.GetFullPath($"Assets/Package.unitypackage");
-            string packagePath = Path.GetFullPath($"Packages/{package.name}");
-            WebClient webclient = new WebClient();
-            webclient.DownloadFile($"{package.latestUrl}?t={DateTime.Now}", filePath);
-            Debug.Log("Attempting to remove old package...");
+    internal static PackageMeta CurrentPackage;
+
+    internal static async void UpdatePackage(string packageUrl, bool ShowDialog = true) {
+        CurrentPackage = await VersionManager.GetPackageInfo(packageUrl);
+        Debug.Log($"Downloading: {CurrentPackage.name}, version {CurrentPackage.version}, from: {CurrentPackage.latestUrl}");
+        string filePath = Path.GetFullPath($"Assets/Package.unitypackage");
+        string packagePath = Path.GetFullPath($"Packages/{CurrentPackage.name}");
+        WebClient webclient = new WebClient();
+        webclient.DownloadFile($"{CurrentPackage.latestUrl}?t={DateTime.Now}", filePath);
+        if (Directory.Exists(packagePath)) {
             Directory.Delete(packagePath, true);
             File.Delete(packagePath + ".meta");
-            UnityEditor.PackageManager.Client.Remove(package.name);
-            AssetDatabase.Refresh();
-            Debug.Log("Importing updated package...");
-            AssetDatabase.ImportPackage(filePath, ShowDialog);
-            File.Delete(filePath);
+        } else {
+            ShowDialog = true;
+            Debug.LogWarning($"{CurrentPackage.name} seems to be installed locally, so we won't Delete anything and Forced Updating is disabled.");
+        }
+        Debug.Log("Importing updated package...");
+        AssetDatabase.importPackageCompleted += UpdateComplete;
+        AssetDatabase.importPackageCancelled += UpdateCanceled;
+        AssetDatabase.ImportPackage(filePath, ShowDialog);
+        File.Delete(filePath);
+        AssetDatabase.Refresh();
 
-        }
-        finally {
-            Debug.Log("Finished Updating PFCToolkit.");
-            EditorUtility.DisplayDialog("Update Complete", $"PFCTools has succesfully been updated to v{package.version}", "close");
-        }
+
+    }
+
+    private static void UpdateCanceled(string packageName) {
+        Debug.LogWarning("Import was Canceled, warning this means that PFCTools may now no longer be present in your project, you'll have to manually reinstall it!");
+        AssetDatabase.importPackageCompleted -= UpdateComplete;
+        AssetDatabase.importPackageCompleted -= UpdateCanceled;
+    }
+
+    private static void UpdateComplete(string packageName) {
+
+        Debug.Log("Finished Updating PFCToolkit.");
+        EditorUtility.DisplayDialog($"PFCTools - {CurrentPackage.version}", $"{CurrentPackage.name} has been updated to version {CurrentPackage.version} succesfully!", "Ok");
+        AssetDatabase.importPackageCompleted -= UpdateComplete;
+        AssetDatabase.importPackageCompleted -= UpdateCanceled;
     }
 
     internal static async Task<PackageMeta> GetPackageInfo(string packageFileUrl) {
